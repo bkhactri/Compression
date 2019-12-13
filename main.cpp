@@ -11,6 +11,7 @@
 #include<direct.h>
 #include <conio.h> 
 #include<time.h>
+#include<Windows.h>
 #include "Uncompress.h"
 #include "jpeg_encoder.h"
 using namespace std;
@@ -61,20 +62,20 @@ void ListFile(char* path, char* compressPath, int choice){
 						Compress(newPath, newCompressPath);
 					}
 				}
-				else{
+				else if (choice == 2) {
 					bool dot = false;
-					for(int i = 0; i < strlen(entry->d_name); i++){
-	            		if(entry->d_name[i] == '.'){
-	            			dot = true;
-	            			break;
+					for (int i = 0; i < strlen(entry->d_name); i++) {
+						if (entry->d_name[i] == '.') {
+							dot = true;
+							break;
 						}
 					}
-					if(dot == false){
+					if (dot == false) {
 						char newPath[260];
 						strcpy(newPath, path);
 						strcat(newPath, "/");
 						strcat(newPath, entry->d_name);
-						
+
 						char newCompressPath[260];
 						strcpy(newCompressPath, compressPath);
 						strcat(newCompressPath, "/");
@@ -82,25 +83,70 @@ void ListFile(char* path, char* compressPath, int choice){
 						_mkdir(newCompressPath);
 						ListFile(newPath, newCompressPath, choice);
 					}
-					else{
+					else {
 						char newPath[100];
 						strcpy(newPath, path);
 						strcat(newPath, "/");
 						strcat(newPath, entry->d_name);
-						
+
 						char newCompressPath[100];
 						strcpy(newCompressPath, compressPath);
 						strcat(newCompressPath, "/");
-						for(int i = strlen(entry->d_name) - 1; i >= 0; i--){
-							if(entry->d_name[i] == '.'){
-								strncat(newCompressPath, entry->d_name, i + 1);	
-								break;	
+						for (int i = strlen(entry->d_name) - 1; i >= 0; i--) {
+							if (entry->d_name[i] == '.') {
+								strncat(newCompressPath, entry->d_name, i + 1);
+								break;
 							}
 						}
 						Uncompress(newPath, newCompressPath);
 					}
 				}
-            	
+				else if (choice == 3){
+					bool dot = false;
+					for (int i = 0; i < strlen(entry->d_name); i++) {
+						if (entry->d_name[i] == '.') {
+							dot = true;
+							break;
+						}
+					}
+					if (dot == false) {
+						char newPath[260];
+						strcpy(newPath, path);
+						strcat(newPath, "/");
+						strcat(newPath, entry->d_name);
+
+						char newCompressPath[260];
+						strcpy(newCompressPath, compressPath);
+						strcat(newCompressPath, "/");
+						strcat(newCompressPath, entry->d_name);
+						_mkdir(newCompressPath);
+						ListFile(newPath, newCompressPath, choice);
+					}
+					else {
+						char newPath[100];
+						strcpy(newPath, path);
+						strcat(newPath, "/");
+						strcat(newPath, entry->d_name);
+
+						char newCompressPath[100];
+						strcpy(newCompressPath, compressPath);
+						strcat(newCompressPath, "/");
+						for (int i = strlen(entry->d_name) - 1; i >= 0; i--) {
+							if (entry->d_name[i] == '.') {
+								strncat(newCompressPath, entry->d_name, i + 1);
+								break;
+							}
+						}
+						strcat(newCompressPath, "jpg");
+						JpegEncoder encoder;
+						encoder.readFromBMP(newPath);
+						if (encoder.encodeToJPG(newCompressPath, 50))
+						{
+							cout << "Nen thanh cong " << endl;
+							Sleep(1000);
+						}
+					}
+				}
 			}
         }
         closedir(pDIR);
@@ -117,7 +163,8 @@ int main(){
 		cout << "3. Nen folder " << endl;
 		cout << "4. Giai nen folder" << endl;
 		cout << "5. Nen anh" << endl;
-		cout << "6. Thoat\n" << endl;
+		cout << "6. Nen folder anh" << endl;
+		cout << "7. Thoat\n" << endl;
 		cout << "Nhap lua chon: ";
 		cin >>  choice;
 		system("cls");
@@ -177,15 +224,24 @@ int main(){
 				cout << "Dinh dang anh can dua vo la bitmap & co the ban da nhap nhap sai" << endl;
 			}
 		
-			if(!encoder.encodeToJPG("out.jpg", 50))
+			if(!encoder.encodeToJPG(newPath, 50))
 			{
 				cout << "Qua trinh nen anh da xay ra loi , xin hay kiem tra lai" << endl;
 			}
 			cout << "Qua trinh nen anh thanh cong . Ban hay kiem tra anh sau khi nen bang file (ten anh sau khi nen).jpg" << endl;
 		}
-		else if(choice == 6) break;
+		else if (choice == 6){
+			cout << "Nhap ten folder anh can nen: ";
+			cin.getline(path, 260);
+			cout << "Nhap ten folder anh moi: ";
+			cin.getline(newPath, 260);
+			_mkdir(newPath);
+			ListFile(path, newPath, 3);
+		}
+		else if(choice == 7) break;
 		system("pause");
 	}
 	system("pause");
 	return 0;
 }
+
