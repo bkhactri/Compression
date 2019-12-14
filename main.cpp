@@ -143,7 +143,7 @@ void ListFile(char* path, char* compressPath, int choice){
 						if (encoder.encodeToJPG(newCompressPath, 50))
 						{
 							cout << "Nen thanh cong " << endl;
-							Sleep(1000);
+							Sleep(500);
 						}
 					}
 				}
